@@ -1,6 +1,4 @@
 <?php
-// config.php
-
 // Database connection settings
 $host = 'localhost'; // Database host
 $dbname = 'form_data'; // Database name
@@ -12,10 +10,36 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     // Set PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    // Display connection success message (optional for debugging)
-    // echo "Connected successfully";
+
+    // Check if form is submitted
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Retrieve form data
+        $firstname = $_POST['firstname'];
+        $middle = $_POST['middle'];
+        $lastname = $_POST['lastname'];
+        $age = $_POST['age'];
+        $address = $_POST['address'];
+        $course = $_POST['course'];
+
+        // Insert data into the 'registration' table
+        $sql = "INSERT INTO registration (firstname, middle, lastname, age, address, course) 
+                VALUES (:firstname, :middle, :lastname, :age, :address, :course)";
+        $stmt = $conn->prepare($sql);
+
+        $stmt->execute([
+            ':firstname' => $firstname,
+            ':middle' => $middle,
+            ':lastname' => $lastname,
+            ':age' => $age,
+            ':address' => $address,
+            ':course' => $course,
+        ]);
+
+        // Confirm data saved
+        echo "Registration successful!";
+    }
 } catch (PDOException $e) {
-    // Handle connection error
-    die("Connection failed: " . $e->getMessage());
+    // Handle database connection or query errors
+    die("Error: " . $e->getMessage());
 }
 ?>
